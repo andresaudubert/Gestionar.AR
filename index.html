@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gestionar.AR – Apps simples y personalizadas para pequeños negocios y emprendedores. Tu app, a tu manera." />
+  <title>gestionar.ar – Tu app, a tu manera</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      background: #f8f9fb;
+      color: #1e2235;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ===== VARIABLES ===== */
+    :root {
+      --azul: #7dd3fc;
+      --azul-dark: #38bdf8;
+      --oscuro: #1e2235;
+      --oscuro2: #252b41;
+      --claro: #f8f9fb;
+      --gris: #8892b0;
+      --verde-wa: #25d366;
+      --verde-wa-hover: #1da851;
+      --radio: 14px;
+      --sombra: 0 4px 24px rgba(0,0,0,0.13);
+    }
+
+    /* ===== UTILIDADES ===== */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section { padding: 80px 0; }
+    .section-dark { background: var(--oscuro); color: #fff; }
+    .section-light { background: var(--claro); color: var(--oscuro); }
+
+    .tag-azul { color: var(--azul); }
+    .tag-verde { color: var(--verde-wa); }
+
+    /* Fade-in al scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+    .fade-in-delay-4 { transition-delay: 0.4s; }
+
+    /* ===== BOTONES ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: var(--radio);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      text-align: center;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+    .btn-wa {
+      background: var(--verde-wa);
+      color: #fff;
+    }
+    .btn-wa:hover { background: var(--verde-wa-hover); }
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.55);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: #fff; }
+    .btn-dark {
+      background: var(--oscuro);
+      color: #fff;
+    }
+    .btn-dark:hover { background: #151929; }
+    .btn-azul {
+      background: var(--azul);
+      color: var(--oscuro);
+    }
+    .btn-azul:hover { background: var(--azul-dark); }
+
+    /* ===== 1. HEADER / HERO ===== */
+    #hero {
+      background: var(--oscuro);
+      color: #fff;
+      padding: 100px 0 90px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(125,211,252,0.08) 0%, transparent 70%);
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .hero-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 36px;
+      display: inline-block;
+    }
+    .hero-logo .ar { color: var(--azul); }
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero-title .highlight { color: var(--azul); }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      color: var(--gris);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .hero-btns-sep {
+      color: var(--gris);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+    .hero-scroll-hint {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--gris);
+      font-size: 0.85rem;
+    }
+    .scroll-arrow {
+      width: 20px; height: 20px;
+      border-right: 2px solid var(--gris);
+      border-bottom: 2px solid var(--gris);
+      transform: rotate(45deg);
+      animation: bounce 1.6s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50% { transform: rotate(45deg) translateY(5px); }
+    }
+
+    /* ===== 2. DEMOS ===== */
+    #demos { background: var(--claro); }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 {
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .section-header p {
+      color: var(--gris);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .section-dark .section-header h2 { color: #fff; }
+    .section-dark .section-header p { color: var(--gris); }
+
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+    .demo-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--sombra);
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .demo-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.14); }
+
+    /* Mockup celular SVG */
+    .phone-mockup {
+      background: linear-gradient(135deg, #1e2235 0%, #252b41 100%);
+      padding: 28px 28px 0;
+      display: flex;
+      justify-content: center;
+    }
+    .phone-frame {
+      width: 200px;
+      background: #fff;
+      border-radius: 24px 24px 0 0;
+      padding: 14px 12px 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .phone-notch {
+      width: 60px; height: 10px;
+      background: var(--oscuro);
+      border-radius: 10px;
+      margin: 0 auto 10px;
+    }
+    .phone-screen {
+      background: #f0f4ff;
+      border-radius: 6px;
+      padding: 10px 8px;
+      min-height: 160px;
+    }
+    .phone-screen-artesanas { background: linear-gradient(160deg, #fdf4ff, #f5e6ff); }
+    .phone-screen-kiosco { background: linear-gradient(160deg, #f0f9ff, #e0f2fe); }
+
+    .ps-header {
+      background: var(--oscuro);
+      border-radius: 6px 6px 0 0;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: -10px -8px 8px;
+    }
+    .ps-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .ps-title { color: #fff; font-size: 0.6rem; font-weight: 700; flex: 1; text-align: center; }
+
+    .ps-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-radius: 6px;
+      padding: 5px 7px;
+      margin-bottom: 5px;
+      font-size: 0.55rem;
+    }
+    .ps-row-label { color: #555; font-weight: 600; }
+    .ps-row-val { color: var(--oscuro); font-weight: 700; }
+    .ps-badge {
+      font-size: 0.48rem;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .ps-badge-green { background: #d1fae5; color: #065f46; }
+    .ps-badge-blue { background: #dbeafe; color: #1e40af; }
+    .ps-stat {
+      text-align: center;
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px;
+      margin-bottom: 5px;
+    }
+    .ps-stat-num { font-size: 1rem; font-weight: 800; color: var(--oscuro); }
+    .ps-stat-lbl { font-size: 0.48rem; color: var(--gris); }
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+    .ps-tag {
+      background: #fff;
+      border-radius: 5px;
+      padding: 4px 5px;
+      font-size: 0.5rem;
+      font-weight: 700;
+      color: var(--oscuro);
+      text-align: center;
+    }
+
+    .demo-info { padding: 24px; }
+    .demo-info h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 8px; }
+    .demo-info p { color: var(--gris); font-size: 0.93rem; margin-bottom: 18px; }
+
+    /* ===== 3. CÓMO FUNCIONA ===== */
+    #como-funciona { background: var(--oscuro); }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 32px;
+      position: relative;
+    }
+    .step-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(125,211,252,0.12);
+      border-radius: 18px;
+      padding: 32px 28px;
+      text-align: center;
+      transition: border-color 0.22s, background 0.22s;
+    }
+    .step-card:hover {
+      border-color: rgba(125,211,252,0.35);
+      background: rgba(125,211,252,0.05);
+    }
+    .step-num {
+      width: 52px; height: 52px;
+      background: var(--azul);
+      color: var(--oscuro);
+      border-radius: 50%;
+      font-size: 1.4rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .step-card p { color: var(--gris); font-size: 0.93rem; }
+
+    /* ===== 4. PARA QUIÉN ===== */
+    #para-quien { background: var(--claro); }
+    .rubros-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 32px 0;
+    }
+    .rubro-chip {
+      background: #fff;
+      border: 1.5px solid rgba(30,34,53,0.12);
+      color: var(--oscuro);
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 0.93rem;
+      font-weight: 600;
+      cursor: default;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .rubro-chip:hover {
+      border-color: var(--azul);
+      background: #e0f2fe;
+      color: var(--oscuro);
+    }
+    .para-quien-sub {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--gris);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .para-quien-sub strong { color: var(--oscuro); }
+
+    /* ===== 5. FAQ ===== */
+    #faq { background: var(--oscuro); }
+    .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(125,211,252,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item.open { border-color: rgba(125,211,252,0.3); }
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 20px 24px;
+      text-align: left;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: color 0.2s;
+    }
+    .faq-question:hover { color: var(--azul); }
+    .faq-item.open .faq-question { color: var(--azul); }
+    .faq-icon {
+      width: 22px; height: 22px;
+      min-width: 22px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: transform 0.3s;
+      line-height: 1;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s;
+      padding: 0 24px;
+      color: var(--gris);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding: 0 24px 20px;
+    }
+
+    /* ===== 6. INVERSIÓN ===== */
+    #inversion { background: var(--claro); }
+    .inversion-wrap {
+      display: flex;
+      justify-content: center;
+    }
+    .inversion-card {
+      background: var(--oscuro);
+      color: #fff;
+      border-radius: 24px;
+      padding: 48px 44px;
+      max-width: 540px;
+      width: 100%;
+      box-shadow: 0 16px 60px rgba(30,34,53,0.22);
+      text-align: center;
+    }
+    .inversion-card h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .inversion-card .precio-hint {
+      color: var(--gris);
+      font-size: 0.93rem;
+      margin-bottom: 32px;
+    }
+    .beneficios-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .beneficios-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.97rem;
+      color: #e2e8f0;
+    }
+    .beneficios-list li .check {
+      color: var(--verde-wa);
+      font-size: 1.1rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+    .modulo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(125,211,252,0.1);
+      border: 1px solid rgba(125,211,252,0.3);
+      color: var(--azul);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    /* ===== 7. TESTIMONIOS (oculto) ===== */
+    #testimonios { display: none; background: var(--oscuro); }
+    .testimonios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .testimonio-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(125,211,252,0.1);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .testimonio-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--gris);
+      margin-bottom: 16px;
+    }
+    .testimonio-text { color: var(--gris); font-size: 0.93rem; margin-bottom: 14px; }
+    .testimonio-name { color: #fff; font-weight: 700; font-size: 0.9rem; }
+
+    /* ===== 8. CONTACTO ===== */
+    #contacto { background: var(--claro); }
+    .contacto-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+    .contacto-inner h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 12px; }
+    .contacto-inner > p { color: var(--gris); margin-bottom: 32px; font-size: 1rem; }
+    .contacto-sep {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 28px 0;
+      color: var(--gris);
+      font-size: 0.9rem;
+    }
+    .contacto-sep::before, .contacto-sep::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(30,34,53,0.12);
+    }
+    .contacto-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: left;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.88rem; font-weight: 600; color: #555; }
+    .form-group input, .form-group textarea {
+      border: 1.5px solid rgba(30,34,53,0.14);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.97rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--oscuro);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--azul);
+      box-shadow: 0 0 0 3px rgba(125,211,252,0.18);
+    }
+    .form-group textarea { min-height: 110px; }
+    .form-submit-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 1rem;
+    }
+
+    /* ===== 9. FOOTER ===== */
+    footer {
+      background: var(--oscuro);
+      color: var(--gris);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .footer-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .footer-logo .ar { color: var(--azul); }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 24px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    .footer-links a {
+      color: var(--gris);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--azul); }
+    .footer-tagline { font-size: 0.82rem; color: #555; }
+
+    /* ===== WHATSAPP FLOTANTE ===== */
+    .wa-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 999;
+      width: 58px; height: 58px;
+      background: var(--verde-wa);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .wa-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 28px rgba(37,211,102,0.55);
+    }
+    .wa-float svg { width: 30px; height: 30px; fill: #fff; }
+    .wa-tooltip {
+      position: absolute;
+      right: 68px;
+      background: #fff;
+      color: var(--oscuro);
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 7px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(6px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .wa-float:hover .wa-tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .section { padding: 60px 0; }
+      #hero { padding: 72px 0 64px; }
+      .hero-btns { flex-direction: column; align-items: center; }
+      .hero-btns .btn { width: 100%; max-width: 300px; justify-content: center; }
+      .demos-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .inversion-card { padding: 36px 24px; }
+      .wa-float { bottom: 20px; right: 20px; }
+    }
+    @media (max-width: 480px) {
+      .hero-title { font-size: 2rem; }
+      .hero-sub { font-size: 0.95rem; }
+      .section-header h2 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 1. HERO ===== -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-logo fade-in">gestionar<span class="ar">.ar</span></div>
+
+    <h1 class="hero-title fade-in fade-in-delay-1">
+      Tu app, <span class="highlight">a tu manera</span>
+    </h1>
+
+    <p class="hero-sub fade-in fade-in-delay-2">
+      Diseñamos apps simples para que puedas manejar tu negocio desde el celular.
+      Sin letra chica, sin costos exagerados.
+    </p>
+
+    <div class="hero-btns fade-in fade-in-delay-3">
+      <a href="#contacto" class="btn btn-azul">
+        Contactanos
+      </a>
+      <span class="hero-btns-sep">o</span>
+      <a href="https://wa.me/5491131613554" target="_blank" rel="noopener" class="btn btn-wa">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.58A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.65-.5-5.22-1.44l-.37-.22-3.67.94.97-3.58-.24-.38A9.94 9.94 0 0 1 2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm5.44-7.42c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.3-.76.96-.93 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.91-2.2-.24-.57-.48-.49-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1-1.03 2.45s1.05 2.84 1.2 3.04c.14.2 2.07 3.16 5.01 4.43.7.3 1.24.48 1.67.62.7.22 1.34.19 1.85.11.56-.08 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.41-.07-.12-.27-.19-.57-.34z"/></svg>
+        Enviá un WhatsApp
+      </a>
+    </div>
+
+    <div class="hero-scroll-hint fade-in fade-in-delay-4">
+      <span>Scrolleá para ver más</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 2. DEMOS ===== -->
+<section id="demos" class="section section-light">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2>Mirá cómo quedan nuestras apps</h2>
+      <p>Estas son demos reales que podés usar ahora mismo</p>
+    </div>
+
+    <div class="demos-grid">
+
+      <!-- Card Vendedores -->
+      <div class="demo-card fade-in fade-in-delay-1">
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen phone-screen-artesanas">
+              <div class="ps-header">
+                <div class="ps-dot" style="background:#ff6b9d"></div>
+                <div class="ps-dot" style="background:#ffd93d"></div>
+                <div class="ps-dot" style="background:#6bcb77"></div>
+                <div class="ps-title">📦 Mis Ventas</div>
+              </div>
+              <div class="ps-grid">
+                <div class="ps-tag">📋 Catálogo</div>
+                <div class="ps-tag">🛒 Pedidos</div>
+                <div class="ps-tag">💰 Cobros</div>
+                <div class="ps-tag">📊 Reportes</div>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">Remera estampada</span>
+                <span class="ps-badge ps-badge-green">$8.500</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">Bolso de tela</span>
+                <span class="ps-badge ps-badge-green">$12.000</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">Pedidos activos</span>
+                <span class="ps-badge ps-badge-blue">11</span>
+              </div>
+              <div class="ps-stat">
+                <div class="ps-stat-num">$87.000</div>
+                <div class="ps-stat-lbl">ventas este mes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-info">
+          <h3>App para Vendedores</h3>
+          <p>Controlá tu catálogo, pedidos y cobros desde el celular. Ideal para quien vende en ferias, redes sociales o puerta a puerta.</p>
+          <a href="#" target="_blank" rel="noopener" class="btn btn-dark">Ver demo</a>
+        </div>
+      </div>
+
+      <!-- Card Kiosco -->
+      <div class="demo-card fade-in fade-in-delay-2">
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen phone-screen-kiosco">
+              <div class="ps-header">
+                <div class="ps-dot" style="background:#ff6b9d"></div>
+                <div class="ps-dot" style="background:#ffd93d"></div>
+                <div class="ps-dot" style="background:#6bcb77"></div>
+                <div class="ps-title">🏪 Mi Kiosco</div>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">☕ Café</span>
+                <span class="ps-row-val">x23</span>
+                <span class="ps-badge ps-badge-green">OK</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">🥤 Gaseosas</span>
+                <span class="ps-row-val">x8</span>
+                <span class="ps-badge ps-badge-blue">Bajo</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">🍫 Alfajores</span>
+                <span class="ps-row-val">x45</span>
+                <span class="ps-badge ps-badge-green">OK</span>
+              </div>
+              <div class="ps-stat">
+                <div class="ps-stat-num">$128.700</div>
+                <div class="ps-stat-lbl">vendido hoy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-info">
+          <h3>App para Kioscos</h3>
+          <p>Controlá stock, ventas diarias y alertas de reposición. Terminá con la libreta y empezá a ver números reales.</p>
+          <a href="#" target="_blank" rel="noopener" class="btn btn-dark">Ver demo</a>
+        </div>
+      </div>
+
+      <!-- Card Peluquería -->
+      <div class="demo-card fade-in fade-in-delay-3">
+        <div class="phone-mockup">
+          <div class="phone-frame">
+            <div class="phone-notch"></div>
+            <div class="phone-screen" style="background: linear-gradient(160deg, #fff7f0, #ffe4d6);">
+              <div class="ps-header">
+                <div class="ps-dot" style="background:#ff6b9d"></div>
+                <div class="ps-dot" style="background:#ffd93d"></div>
+                <div class="ps-dot" style="background:#6bcb77"></div>
+                <div class="ps-title">✂️ Mi Peluquería</div>
+              </div>
+              <div class="ps-grid">
+                <div class="ps-tag">📅 Turnos</div>
+                <div class="ps-tag">👤 Clientes</div>
+                <div class="ps-tag">🧴 Stock</div>
+                <div class="ps-tag">💈 Servicios</div>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">10:00 — María G.</span>
+                <span class="ps-badge ps-badge-green">Confirmado</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">11:30 — Lucas R.</span>
+                <span class="ps-badge ps-badge-blue">Pendiente</span>
+              </div>
+              <div class="ps-row">
+                <span class="ps-row-label">Tinte #3 (stock)</span>
+                <span class="ps-badge" style="background:#fee2e2;color:#991b1b;">Bajo</span>
+              </div>
+              <div class="ps-stat">
+                <div class="ps-stat-num">8</div>
+                <div class="ps-stat-lbl">turnos hoy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-info">
+          <h3>App para Peluquerías</h3>
+          <p>Gestioná turnos, clientes y stock de productos desde el celular. Sin papeles, sin olvidos, sin llamadas perdidas.</p>
+          <a href="#" target="_blank" rel="noopener" class="btn btn-dark">Ver demo</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 3. CÓMO FUNCIONA ===== -->
+<section id="como-funciona" class="section section-dark">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2>Tres pasos y ya tenés tu app</h2>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card fade-in fade-in-delay-1">
+        <div class="step-num">1</div>
+        <h3>Me contás cómo es tu negocio</h3>
+        <p>Por WhatsApp o formulario, sin tecnicismos. Hablamos como dos personas normales sobre cómo funciona lo tuyo.</p>
+      </div>
+      <div class="step-card fade-in fade-in-delay-2">
+        <div class="step-num">2</div>
+        <h3>Te muestro una demo en 5 días</h3>
+        <p>La ves funcionar antes de pagar el resto. Me decís qué cambiar y lo ajustamos hasta que quede como te imaginabas.</p>
+      </div>
+      <div class="step-card fade-in fade-in-delay-3">
+        <div class="step-num">3</div>
+        <h3>La usás desde tu celular, PC o tablet</h3>
+        <p>Sin instalar nada. Abrís la app desde el navegador en cualquier dispositivo y listo. Yo me encargo del hosting, las actualizaciones y el soporte.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 4. PARA QUIÉN ===== -->
+<section id="para-quien" class="section section-light">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2>Pensado para negocios que arrancan o que crecen</h2>
+      <p>Si hoy manejás todo con una libreta, un Excel o de memoria, esta app es para vos.</p>
+    </div>
+
+    <div class="rubros-wrap fade-in fade-in-delay-1">
+      <span class="rubro-chip">🏪 Kioscos</span>
+      <span class="rubro-chip">🧶 Artesanos</span>
+      <span class="rubro-chip">🥦 Verdulerías</span>
+      <span class="rubro-chip">✂️ Peluquerías</span>
+      <span class="rubro-chip">🔧 Talleres</span>
+      <span class="rubro-chip">📦 Vendedores online</span>
+      <span class="rubro-chip">🛒 Comercios</span>
+      <span class="rubro-chip">⚽ Clubes</span>
+    </div>
+
+    <p class="para-quien-sub fade-in fade-in-delay-2">
+      <strong>¿No ves tu rubro?</strong> Consultanos igual — si lo podemos imaginar, lo podemos hacer.
+    </p>
+  </div>
+</section>
+
+
+<!-- ===== 5. FAQ ===== -->
+<section id="faq" class="section section-dark">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2>Preguntas frecuentes</h2>
+    </div>
+
+    <div class="faq-list fade-in fade-in-delay-1">
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Necesito saber de tecnología para usar la app?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          No. Las apps de Gestionar están diseñadas para personas que no tienen experiencia con tecnología. Si sabés usar WhatsApp, podés usar tu app. Te capacitamos al momento de la entrega y te acompañamos en los primeros días.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Tengo que instalar algo en el celular?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          No. Tu app vive en internet y la abrís desde el navegador de tu celular, tablet o computadora. No ocupa espacio en tu dispositivo y siempre está actualizada automáticamente.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Cómo es el proceso desde que me contacto hasta tener la app?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Es muy simple: primero hablamos para entender tu negocio, después te mostramos una demo funcionando en 5 días hábiles para que la apruebes, y una vez que confirmás publicamos la app y te capacitamos para usarla. Todo el proceso lleva entre 1 y 2 semanas.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Puedo pedir cambios después de que esté lista?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí. El mantenimiento mensual incluye hasta 2 ajustes menores por mes. Los cambios más grandes se presupuestan aparte según el trabajo que impliquen.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Funciona para cualquier tipo de negocio?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí. Diseñamos apps para kioscos, artesanas, peluquerías, talleres, verdulerías, vendedores online, clubes, asociaciones y cualquier negocio que necesite organizarse mejor. Si tenés dudas sobre tu caso particular, consultanos sin compromiso.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Qué pasa si no me gusta la demo?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          La demo existe justamente para eso — para que puedas ver y aprobar antes de confirmar. Si algo no te convence lo ajustamos. Solo confirmás y pagás el resto cuando estás conforme con lo que ves.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Puedo cobrar con MercadoPago desde la app?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí, es un módulo opcional. Si lo agregás, tus clientes pueden pagar con QR, link de pago o tarjeta directamente desde la app. Solo necesitás tener una cuenta de MercadoPago activa como vendedor, que es gratuita. Las comisiones de MP por cada cobro corren por cuenta de tu negocio.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Cuánto cuesta y cómo se paga?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          El desarrollo tiene un precio accesible según la complejidad de tu app. Se paga en dos partes: 50% para arrancar y 50% al aprobar la demo. Después hay una cuota mensual de mantenimiento y soporte. Consultanos para recibir una propuesta personalizada sin compromiso.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Mis datos están seguros?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          Sí. Tu app es exclusivamente tuya — nadie más tiene acceso a tu información. Los datos se guardan de forma segura y solo vos podés verlos desde tu dispositivo.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          ¿Qué pasa si dejo de pagar el mantenimiento?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          La app sigue funcionando. El mantenimiento cubre soporte, ajustes y hosting. Si decidís no continuar, te entregamos el código de tu app para que puedas alojarla donde quieras. Sin letra chica.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 6. INVERSIÓN ===== -->
+<section id="inversion" class="section section-light">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2>Tecnología accesible para cualquier negocio</h2>
+    </div>
+
+    <div class="inversion-wrap fade-in fade-in-delay-1">
+      <div class="inversion-card">
+        <h3>Precio de desarrollo accesible según tu negocio</h3>
+        <p class="precio-hint">Consultanos para recibir una propuesta personalizada sin compromiso</p>
+
+        <ul class="beneficios-list">
+          <li><span class="check">✔</span> App personalizada para tu negocio</li>
+          <li><span class="check">✔</span> Demo gratis antes de confirmar</li>
+          <li><span class="check">✔</span> Funciona desde el celular sin instalar nada</li>
+          <li><span class="check">✔</span> Soporte por WhatsApp incluido</li>
+          <li><span class="check">✔</span> Reportes descargables en Excel</li>
+        </ul>
+
+        <div class="modulo-badge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+          Módulo opcional: cobro con MercadoPago
+        </div>
+
+        <a href="https://wa.me/5491131613554" target="_blank" rel="noopener" class="btn btn-wa" style="width:100%; justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.58A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.65-.5-5.22-1.44l-.37-.22-3.67.94.97-3.58-.24-.38A9.94 9.94 0 0 1 2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm5.44-7.42c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.3-.76.96-.93 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.91-2.2-.24-.57-.48-.49-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1-1.03 2.45s1.05 2.84 1.2 3.04c.14.2 2.07 3.16 5.01 4.43.7.3 1.24.48 1.67.62.7.22 1.34.19 1.85.11.56-.08 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.41-.07-.12-.27-.19-.57-.34z"/></svg>
+          Consultar por WhatsApp
+        </a>
+        <div style="display:flex; align-items:center; gap:12px; margin-top:14px;">
+          <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
+          <span style="color:var(--gris); font-size:0.85rem; font-style:italic;">o</span>
+          <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
+        </div>
+        <a href="#contacto" class="btn btn-azul" style="width:100%; justify-content:center; margin-top:14px;">
+          Contactanos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 7. TESTIMONIOS (oculto) ===== -->
+<section id="testimonios" class="section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <h2>Lo que dicen nuestros clientes</h2>
+    </div>
+    <div class="testimonios-grid">
+      <div class="testimonio-card">
+        <div class="testimonio-avatar"></div>
+        <p class="testimonio-text">"[Testimonio próximamente]"</p>
+        <span class="testimonio-name">— Nombre, Rubro</span>
+      </div>
+      <div class="testimonio-card">
+        <div class="testimonio-avatar"></div>
+        <p class="testimonio-text">"[Testimonio próximamente]"</p>
+        <span class="testimonio-name">— Nombre, Rubro</span>
+      </div>
+      <div class="testimonio-card">
+        <div class="testimonio-avatar"></div>
+        <p class="testimonio-text">"[Testimonio próximamente]"</p>
+        <span class="testimonio-name">— Nombre, Rubro</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 8. CONTACTO ===== -->
+<section id="contacto" class="section section-light">
+  <div class="container">
+    <div class="contacto-inner">
+
+      <h2 class="fade-in">¿Te interesa? Hablemos</h2>
+      <p class="fade-in fade-in-delay-1">Contame de qué trata tu negocio y te respondo con una propuesta en menos de 24 horas.</p>
+
+      <a href="https://wa.me/5491131613554" target="_blank" rel="noopener" class="btn btn-wa fade-in fade-in-delay-2" style="width:100%; justify-content:center; font-size:1.08rem; padding:18px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.58A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.65-.5-5.22-1.44l-.37-.22-3.67.94.97-3.58-.24-.38A9.94 9.94 0 0 1 2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm5.44-7.42c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.3-.76.96-.93 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.91-2.2-.24-.57-.48-.49-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1-1.03 2.45s1.05 2.84 1.2 3.04c.14.2 2.07 3.16 5.01 4.43.7.3 1.24.48 1.67.62.7.22 1.34.19 1.85.11.56-.08 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.41-.07-.12-.27-.19-.57-.34z"/></svg>
+        Escribinos por WhatsApp
+      </a>
+
+      <div class="contacto-sep fade-in fade-in-delay-3">— o completá el formulario —</div>
+
+      <form
+        class="contacto-form fade-in fade-in-delay-4"
+        action="https://formspree.io/f/xpqbpnon"
+        method="POST"
+        id="contact-form"
+      >
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+        </div>
+        <div class="form-group">
+          <label for="negocio">Negocio</label>
+          <input type="text" id="negocio" name="negocio" placeholder="¿A qué se dedica tu negocio?" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+        </div>
+        <div class="form-group">
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" name="mensaje" placeholder="Contame qué necesitás o qué querés organizar mejor..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark form-submit-btn">Enviar mensaje</button>
+        <p id="form-status" style="text-align:center; font-size:0.9rem; color:var(--gris); min-height:20px;"></p>
+      </form>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== 9. FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">gestionar<span class="ar">.ar</span></div>
+    <div class="footer-links">
+      <a href="https://instagram.com/gestiionar.ar" target="_blank" rel="noopener">📸 @gestiionar.ar</a>
+      <a href="mailto:info@gestionar.ar">✉️ info@gestionar.ar</a>
+    </div>
+    <p class="footer-tagline">Apps simples para negocios reales · Argentina</p>
+  </div>
+</footer>
+
+
+<!-- ===== WHATSAPP FLOTANTE ===== -->
+<a href="https://wa.me/5491131613554" target="_blank" rel="noopener" class="wa-float" aria-label="Contactar por WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.99L0 24l6.18-1.58A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.65-.5-5.22-1.44l-.37-.22-3.67.94.97-3.58-.24-.38A9.94 9.94 0 0 1 2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm5.44-7.42c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.3-.76.96-.93 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.91-2.2-.24-.57-.48-.49-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.03 1-1.03 2.45s1.05 2.84 1.2 3.04c.14.2 2.07 3.16 5.01 4.43.7.3 1.24.48 1.67.62.7.22 1.34.19 1.85.11.56-.08 1.76-.72 2.01-1.41.25-.7.25-1.3.17-1.41-.07-.12-.27-.19-.57-.34z"/>
+  </svg>
+  <span class="wa-tooltip">¡Escribinos!</span>
+</a>
+
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+  // --- Scroll fade-in ---
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  fadeEls.forEach(el => observer.observe(el));
+
+  // Activar elementos del hero de inmediato
+  document.querySelectorAll('#hero .fade-in').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), i * 120);
+  });
+
+  // --- FAQ Acordeón ---
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      // Cerrar todos
+      document.querySelectorAll('.faq-item').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+      });
+
+      // Abrir el clickeado si estaba cerrado
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // --- Formspree AJAX ---
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('form-status');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+      status.textContent = '';
+      try {
+        const data = new FormData(form);
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { Accept: 'application/json' }
+        });
+        if (res.ok) {
+          status.style.color = '#25d366';
+          status.textContent = '✔ ¡Mensaje enviado! Te respondo en menos de 24 hs.';
+          form.reset();
+        } else {
+          throw new Error('error');
+        }
+      } catch {
+        status.style.color = '#f87171';
+        status.textContent = 'Hubo un error. Podés escribirnos directamente por WhatsApp.';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar mensaje';
+      }
+    });
+  }
+
+  // --- Scroll suave para btn "Ver más info" ---
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

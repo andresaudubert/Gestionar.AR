@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>App para Kioscos – Demo Gestionar.AR</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--azul:#7dd3fc;--oscuro:#1e2235;--claro:#f8f9fb;--gris:#8892b0;--verde:#25d366;--rojo:#f87171;--amarillo:#fbbf24;--border:#e5e7eb;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f9ff;color:var(--oscuro);min-height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
+    .app-header{background:var(--oscuro);color:#fff;padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .app-logo{font-size:1rem;font-weight:800;}.app-logo span{color:var(--azul);}
+    .app-title{font-size:1.05rem;font-weight:700;text-align:center;flex:1;}
+    .app-avatar{width:34px;height:34px;background:var(--azul);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:var(--oscuro);}
+    .demo-banner{background:linear-gradient(90deg,#7dd3fc22,#7dd3fc44);border-bottom:1px solid #7dd3fc55;padding:7px 16px;text-align:center;font-size:0.75rem;color:var(--azul);font-weight:600;}
+    .demo-banner a{color:#fff;text-decoration:underline;}
+    .tab-content{display:none;flex:1;padding:16px;padding-bottom:80px;}
+    .tab-content.active{display:block;}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;}
+    .nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--gris);font-size:0.68rem;font-weight:600;transition:color 0.2s;}
+    .nav-btn.active{color:var(--oscuro);}
+    .nav-btn svg{width:22px;height:22px;}
+    .nav-indicator{width:22px;height:3px;border-radius:3px;background:var(--azul);opacity:0;transition:opacity 0.2s;}
+    .nav-btn.active .nav-indicator{opacity:1;}
+    .card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .card-title{font-size:0.9rem;font-weight:700;}
+    .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .stat-box{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+    .stat-num{font-size:1.4rem;font-weight:800;}
+    .stat-lbl{font-size:0.7rem;color:var(--gris);margin-top:2px;}
+    .stat-box.accent{background:var(--oscuro);}.stat-box.accent .stat-num{color:var(--azul);}.stat-box.accent .stat-lbl{color:var(--gris);}
+    .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+    .badge-green{background:#d1fae5;color:#065f46;}
+    .badge-red{background:#fee2e2;color:#991b1b;}
+    .badge-yellow{background:#fef3c7;color:#92400e;}
+    .badge-blue{background:#dbeafe;color:#1e40af;}
+    .stock-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+    .stock-item:last-child{border-bottom:none;}
+    .stock-emoji{width:38px;height:38px;background:#f0f4ff;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+    .stock-info{flex:1;}
+    .stock-name{font-weight:700;font-size:0.9rem;}
+    .stock-cat{font-size:0.73rem;color:var(--gris);}
+    .stock-controls{display:flex;align-items:center;gap:8px;}
+    .qty{font-weight:800;font-size:1rem;min-width:28px;text-align:center;}
+    .qty-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background 0.15s;}
+    .qty-btn:hover{background:#f0f4ff;}
+    .section-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gris);margin:16px 0 8px;}
+    .form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+    .form-row label{font-size:0.82rem;font-weight:600;color:#555;}
+    .form-row input,.form-row select{border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-size:0.95rem;font-family:inherit;background:#fff;transition:border-color 0.2s;}
+    .form-row input:focus,.form-row select:focus{outline:none;border-color:var(--azul);}
+    .btn-primary{background:var(--oscuro);color:#fff;border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+    .btn-primary:active{transform:scale(0.98);}
+    .venta-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+    .venta-item:last-child{border-bottom:none;}
+    .venta-prod{font-weight:600;font-size:0.9rem;}
+    .venta-meta{font-size:0.75rem;color:var(--gris);}
+    .venta-monto{font-weight:800;}
+    .alerta-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+    .alerta-item:last-child{border-bottom:none;}
+    .alerta-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+    .alerta-icon.rojo{background:#fee2e2;}
+    .alerta-icon.amarillo{background:#fef3c7;}
+    .alerta-info{flex:1;}
+    .alerta-nombre{font-weight:700;font-size:0.9rem;}
+    .alerta-desc{font-size:0.78rem;color:var(--gris);}
+    .total-dia{background:var(--oscuro);border-radius:14px;padding:18px;text-align:center;margin-bottom:14px;}
+    .total-dia-num{font-size:2rem;font-weight:900;color:var(--azul);}
+    .total-dia-lbl{color:var(--gris);font-size:0.85rem;margin-top:2px;}
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--oscuro);color:#fff;padding:10px 20px;border-radius:10px;font-size:0.85rem;font-weight:600;opacity:0;transition:opacity 0.3s;z-index:200;white-space:nowrap;}
+    .toast.show{opacity:1;}
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-logo">g<span>.ar</span></div>
+  <div class="app-title">🏪 Mi Kiosco</div>
+  <div class="app-avatar">KI</div>
+</div>
+<div class="demo-banner">🎯 Esto es una demo — <a href="https://gestionar.ar">conocé más en gestionar.ar</a></div>
+
+<!-- STOCK -->
+<div class="tab-content active" id="tab-stock">
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num">24</div><div class="stat-lbl">Productos</div></div>
+    <div class="stat-box accent"><div class="stat-num" style="color:#f87171;" id="cant-alertas">3</div><div class="stat-lbl">Con stock bajo</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Stock actual</span><span class="badge badge-blue">Editá las cantidades</span></div>
+    <div id="stock-list">
+      <div class="stock-item">
+        <div class="stock-emoji">☕</div>
+        <div class="stock-info"><div class="stock-name">Café</div><div class="stock-cat">Bebidas calientes</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">23</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🥤</div>
+        <div class="stock-info"><div class="stock-name">Gaseosas</div><div class="stock-cat">Bebidas frías</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">8</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🍫</div>
+        <div class="stock-info"><div class="stock-name">Alfajores</div><div class="stock-cat">Golosinas</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">45</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🍬</div>
+        <div class="stock-info"><div class="stock-name">Caramelos</div><div class="stock-cat">Golosinas</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">120</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🧃</div>
+        <div class="stock-info"><div class="stock-name">Jugos</div><div class="stock-cat">Bebidas frías</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">5</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🍪</div>
+        <div class="stock-info"><div class="stock-name">Galletas</div><div class="stock-cat">Galletitas</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">32</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VENTAS -->
+<div class="tab-content" id="tab-ventas">
+  <div class="total-dia">
+    <div class="total-dia-num" id="total-hoy">$128.700</div>
+    <div class="total-dia-lbl">Vendido hoy</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Registrar venta</span></div>
+    <div class="form-row">
+      <label>Producto</label>
+      <select id="venta-prod">
+        <option data-precio="1200">☕ Café – $1.200</option>
+        <option data-precio="800">🥤 Gaseosa – $800</option>
+        <option data-precio="650">🍫 Alfajor – $650</option>
+        <option data-precio="150">🍬 Caramelo – $150</option>
+        <option data-precio="700">🧃 Jugo – $700</option>
+        <option data-precio="450">🍪 Galletas – $450</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Cantidad</label>
+      <input type="number" id="venta-cant" value="1" min="1"/>
+    </div>
+    <button class="btn-primary" onclick="registrarVenta()">✔ Registrar venta</button>
+  </div>
+
+  <div class="section-title">Últimas ventas</div>
+  <div class="card">
+    <div id="ventas-list">
+      <div class="venta-item"><div><div class="venta-prod">☕ Café x3</div><div class="venta-meta">09:15 hs</div></div><div class="venta-monto">$3.600</div></div>
+      <div class="venta-item"><div><div class="venta-prod">🍫 Alfajor x5</div><div class="venta-meta">10:02 hs</div></div><div class="venta-monto">$3.250</div></div>
+      <div class="venta-item"><div><div class="venta-prod">🥤 Gaseosa x2</div><div class="venta-meta">11:30 hs</div></div><div class="venta-monto">$1.600</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTAS -->
+<div class="tab-content" id="tab-alertas">
+  <div class="card">
+    <div class="card-header"><span class="card-title">⚠️ Stock bajo</span><span class="badge badge-red" id="alertas-badge">3 productos</span></div>
+    <div id="alertas-list">
+      <div class="alerta-item">
+        <div class="alerta-icon rojo">🥤</div>
+        <div class="alerta-info"><div class="alerta-nombre">Gaseosas</div><div class="alerta-desc">Solo 8 unidades · Reponer pronto</div></div>
+        <span class="badge badge-red">Bajo</span>
+      </div>
+      <div class="alerta-item">
+        <div class="alerta-icon amarillo">🧃</div>
+        <div class="alerta-info"><div class="alerta-nombre">Jugos</div><div class="alerta-desc">Solo 5 unidades · Casi sin stock</div></div>
+        <span class="badge badge-yellow">Crítico</span>
+      </div>
+      <div class="alerta-item">
+        <div class="alerta-icon amarillo">☕</div>
+        <div class="alerta-info"><div class="alerta-nombre">Café</div><div class="alerta-desc">23 unidades · Revisar pronto</div></div>
+        <span class="badge badge-yellow">Medio</span>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center;color:var(--gris);font-size:0.8rem;">Bajá el stock desde la pestaña Stock para ver nuevas alertas</p>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('stock',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    Stock
+    <div class="nav-indicator"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('ventas',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Ventas
+    <div class="nav-indicator"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('alertas',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Alertas
+    <div class="nav-indicator"></div>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function cambiarQty(btn, delta) {
+    const span = btn.parentElement.querySelector('.qty');
+    let val = parseInt(span.textContent) + delta;
+    if (val < 0) val = 0;
+    span.textContent = val;
+    if (val <= 10) span.style.color = '#f87171';
+    else span.style.color = '';
+    showToast('Stock actualizado ✔');
+  }
+
+  let totalHoy = 128700;
+
+  function registrarVenta() {
+    const sel = document.getElementById('venta-prod');
+    const precio = parseInt(sel.options[sel.selectedIndex].dataset.precio);
+    const cant = parseInt(document.getElementById('venta-cant').value) || 1;
+    const nombre = sel.value.split('–')[0].trim();
+    const monto = precio * cant;
+    totalHoy += monto;
+    document.getElementById('total-hoy').textContent = '$' + totalHoy.toLocaleString('es-AR');
+
+    const now = new Date();
+    const hora = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const item = document.createElement('div');
+    item.className = 'venta-item';
+    item.innerHTML = `<div><div class="venta-prod">${nombre} x${cant}</div><div class="venta-meta">${hora} hs</div></div><div class="venta-monto">$${monto.toLocaleString('es-AR')}</div>`;
+    document.getElementById('ventas-list').prepend(item);
+    showToast('Venta registrada ✔');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+</script>
+</body>
+</html>

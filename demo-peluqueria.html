@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>App para Peluquerías – Demo Gestionar.AR</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--azul:#7dd3fc;--oscuro:#1e2235;--gris:#8892b0;--verde:#25d366;--rojo:#f87171;--border:#e5e7eb;}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff7f0;color:var(--oscuro);min-height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
+    .app-header{background:var(--oscuro);color:#fff;padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .app-logo{font-size:1rem;font-weight:800;}.app-logo span{color:var(--azul);}
+    .app-title{font-size:1.05rem;font-weight:700;text-align:center;flex:1;}
+    .app-avatar{width:34px;height:34px;background:#ff9a7b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:700;color:#fff;}
+    .demo-banner{background:linear-gradient(90deg,#7dd3fc22,#7dd3fc44);border-bottom:1px solid #7dd3fc55;padding:7px 16px;text-align:center;font-size:0.75rem;color:var(--azul);font-weight:600;}
+    .demo-banner a{color:#fff;text-decoration:underline;}
+    .tab-content{display:none;flex:1;padding:16px;padding-bottom:80px;}
+    .tab-content.active{display:block;}
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;}
+    .nav-btn{flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--gris);font-size:0.68rem;font-weight:600;transition:color 0.2s;}
+    .nav-btn.active{color:var(--oscuro);}
+    .nav-btn svg{width:22px;height:22px;}
+    .nav-indicator{width:22px;height:3px;border-radius:3px;background:#ff9a7b;opacity:0;transition:opacity 0.2s;}
+    .nav-btn.active .nav-indicator{opacity:1;}
+    .card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .card-title{font-size:0.9rem;font-weight:700;}
+    .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .stat-box{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+    .stat-num{font-size:1.4rem;font-weight:800;}
+    .stat-lbl{font-size:0.7rem;color:var(--gris);margin-top:2px;}
+    .stat-box.accent{background:var(--oscuro);}.stat-box.accent .stat-num{color:#ff9a7b;}.stat-box.accent .stat-lbl{color:var(--gris);}
+    .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+    .badge-green{background:#d1fae5;color:#065f46;}
+    .badge-blue{background:#dbeafe;color:#1e40af;}
+    .badge-yellow{background:#fef3c7;color:#92400e;}
+    .badge-red{background:#fee2e2;color:#991b1b;}
+    .badge-pink{background:#fce7f3;color:#9d174d;}
+    .turno-item{padding:13px 0;border-bottom:1px solid var(--border);}
+    .turno-item:last-child{border-bottom:none;}
+    .turno-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+    .turno-hora{font-weight:900;font-size:1rem;color:var(--oscuro);}
+    .turno-nombre{font-weight:700;font-size:0.92rem;}
+    .turno-servicio{font-size:0.8rem;color:var(--gris);}
+    .turno-precio{font-weight:800;font-size:0.9rem;}
+    .btn-confirmar{background:#d1fae5;color:#065f46;border:none;border-radius:7px;padding:5px 11px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.2s;}
+    .btn-confirmar:hover{background:#a7f3d0;}
+    .btn-confirmar.confirmed{background:#065f46;color:#fff;}
+    .cliente-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+    .cliente-item:last-child{border-bottom:none;}
+    .cliente-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:800;color:#fff;flex-shrink:0;}
+    .cliente-info{flex:1;}
+    .cliente-nombre{font-weight:700;font-size:0.92rem;}
+    .cliente-meta{font-size:0.75rem;color:var(--gris);}
+    .stock-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+    .stock-item:last-child{border-bottom:none;}
+    .stock-emoji{width:38px;height:38px;background:#fff7f0;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+    .stock-info{flex:1;}
+    .stock-name{font-weight:700;font-size:0.9rem;}
+    .stock-cat{font-size:0.73rem;color:var(--gris);}
+    .stock-controls{display:flex;align-items:center;gap:8px;}
+    .qty{font-weight:800;font-size:1rem;min-width:28px;text-align:center;}
+    .qty-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+    .qty-btn:hover{background:#fff7f0;}
+    .form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+    .form-row label{font-size:0.82rem;font-weight:600;color:#555;}
+    .form-row input,.form-row select{border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;font-size:0.95rem;font-family:inherit;background:#fff;transition:border-color 0.2s;}
+    .form-row input:focus,.form-row select:focus{outline:none;border-color:#ff9a7b;}
+    .btn-primary{background:var(--oscuro);color:#fff;border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;}
+    .section-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gris);margin:16px 0 8px;}
+    .fecha-banner{background:var(--oscuro);border-radius:10px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .fecha-txt{color:#fff;font-weight:700;font-size:0.9rem;}
+    .fecha-sub{color:var(--gris);font-size:0.75rem;}
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--oscuro);color:#fff;padding:10px 20px;border-radius:10px;font-size:0.85rem;font-weight:600;opacity:0;transition:opacity 0.3s;z-index:200;white-space:nowrap;}
+    .toast.show{opacity:1;}
+    .new-turno-form{display:none;}.new-turno-form.open{display:block;}
+    .btn-secondary{background:#f0f4ff;color:var(--oscuro);border:none;border-radius:10px;padding:11px;font-size:0.9rem;font-weight:700;cursor:pointer;width:100%;margin-bottom:10px;}
+  </style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="app-logo">g<span>.ar</span></div>
+  <div class="app-title">✂️ Mi Peluquería</div>
+  <div class="app-avatar">PE</div>
+</div>
+<div class="demo-banner">🎯 Esto es una demo — <a href="https://gestionar.ar">conocé más en gestionar.ar</a></div>
+
+<!-- TURNOS -->
+<div class="tab-content active" id="tab-turnos">
+  <div class="stats-row">
+    <div class="stat-box accent"><div class="stat-num" id="cant-turnos">8</div><div class="stat-lbl">Turnos hoy</div></div>
+    <div class="stat-box"><div class="stat-num" id="cant-confirmados">5</div><div class="stat-lbl">Confirmados</div></div>
+  </div>
+
+  <div class="fecha-banner">
+    <div><div class="fecha-txt">Lunes 4 de mayo</div><div class="fecha-sub">Hoy</div></div>
+    <span class="badge badge-blue">8 turnos</span>
+  </div>
+
+  <button class="btn-secondary" onclick="toggleNuevoTurno()">+ Agregar turno</button>
+  <div class="new-turno-form card" id="nuevo-turno-form">
+    <div class="card-header"><span class="card-title">Nuevo turno</span></div>
+    <div class="form-row"><label>Hora</label><input type="time" id="nt-hora" value="14:00"/></div>
+    <div class="form-row"><label>Cliente</label><input type="text" id="nt-cliente" placeholder="Nombre del cliente"/></div>
+    <div class="form-row"><label>Servicio</label>
+      <select id="nt-servicio">
+        <option>Corte de pelo – $4.500</option>
+        <option>Corte + barba – $6.500</option>
+        <option>Tintura – $9.000</option>
+        <option>Mechas – $14.000</option>
+        <option>Peinado – $5.000</option>
+      </select>
+    </div>
+    <button class="btn-primary" onclick="agregarTurno()">✔ Guardar turno</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Agenda del día</span></div>
+    <div id="turnos-list">
+      <div class="turno-item">
+        <div class="turno-top"><span class="turno-hora">09:00</span><span class="badge badge-green">Confirmado</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div class="turno-nombre">María González</div><div class="turno-servicio">Tintura · $9.000</div></div>
+        </div>
+      </div>
+      <div class="turno-item">
+        <div class="turno-top"><span class="turno-hora">10:30</span><span class="badge badge-green">Confirmado</span></div>
+        <div><div class="turno-nombre">Lucas Rodríguez</div><div class="turno-servicio">Corte + barba · $6.500</div></div>
+      </div>
+      <div class="turno-item">
+        <div class="turno-top"><span class="turno-hora">11:30</span><span class="badge badge-yellow">Pendiente</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div class="turno-nombre">Ana Martínez</div><div class="turno-servicio">Mechas · $14.000</div></div>
+          <button class="btn-confirmar" onclick="confirmarTurno(this)">Confirmar</button>
+        </div>
+      </div>
+      <div class="turno-item">
+        <div class="turno-top"><span class="turno-hora">13:00</span><span class="badge badge-yellow">Pendiente</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div class="turno-nombre">Valentina López</div><div class="turno-servicio">Corte de pelo · $4.500</div></div>
+          <button class="btn-confirmar" onclick="confirmarTurno(this)">Confirmar</button>
+        </div>
+      </div>
+      <div class="turno-item">
+        <div class="turno-top"><span class="turno-hora">15:00</span><span class="badge badge-green">Confirmado</span></div>
+        <div><div class="turno-nombre">Carlos Fernández</div><div class="turno-servicio">Corte de pelo · $4.500</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTES -->
+<div class="tab-content" id="tab-clientes">
+  <div class="stats-row">
+    <div class="stat-box accent"><div class="stat-num">24</div><div class="stat-lbl">Clientes</div></div>
+    <div class="stat-box"><div class="stat-num">8</div><div class="stat-lbl">Este mes</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Mis clientes</span></div>
+    <div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#ff9a7b;">MG</div>
+        <div class="cliente-info"><div class="cliente-nombre">María González</div><div class="cliente-meta">Última visita: hoy · Tintura</div></div>
+        <span class="badge badge-pink">VIP</span>
+      </div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#7dd3fc;color:#1e2235;">LR</div>
+        <div class="cliente-info"><div class="cliente-nombre">Lucas Rodríguez</div><div class="cliente-meta">Última visita: hoy · Corte + barba</div></div>
+      </div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#a78bfa;">AM</div>
+        <div class="cliente-info"><div class="cliente-nombre">Ana Martínez</div><div class="cliente-meta">Próximo turno: hoy 11:30 hs</div></div>
+        <span class="badge badge-yellow">Hoy</span>
+      </div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#34d399;color:#fff;">VL</div>
+        <div class="cliente-info"><div class="cliente-nombre">Valentina López</div><div class="cliente-meta">Última visita: 28/04 · Corte</div></div>
+      </div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#fb923c;">CF</div>
+        <div class="cliente-info"><div class="cliente-nombre">Carlos Fernández</div><div class="cliente-meta">Última visita: 20/04 · Corte</div></div>
+      </div>
+      <div class="cliente-item">
+        <div class="cliente-avatar" style="background:#f472b6;">SP</div>
+        <div class="cliente-info"><div class="cliente-nombre">Sofía Pérez</div><div class="cliente-meta">Última visita: 15/04 · Mechas</div></div>
+        <span class="badge badge-pink">VIP</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK -->
+<div class="tab-content" id="tab-stock">
+  <div class="stats-row">
+    <div class="stat-box"><div class="stat-num">12</div><div class="stat-lbl">Productos</div></div>
+    <div class="stat-box accent"><div class="stat-num" style="color:#f87171;">2</div><div class="stat-lbl">Stock bajo</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Insumos</span><span class="badge badge-blue">Editá cantidades</span></div>
+    <div>
+      <div class="stock-item">
+        <div class="stock-emoji">🧴</div>
+        <div class="stock-info"><div class="stock-name">Tinte #3 Castaño</div><div class="stock-cat">Coloración</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty" style="color:#f87171;">2</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">✨</div>
+        <div class="stock-info"><div class="stock-name">Decoloración</div><div class="stock-cat">Mechas</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty" style="color:#f87171;">3</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">💇</div>
+        <div class="stock-info"><div class="stock-name">Shampoo profesional</div><div class="stock-cat">Lavado</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">8</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">🪒</div>
+        <div class="stock-info"><div class="stock-name">Hojas de afeitar</div><div class="stock-cat">Barba</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">24</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+      <div class="stock-item">
+        <div class="stock-emoji">💆</div>
+        <div class="stock-info"><div class="stock-name">Acondicionador</div><div class="stock-cat">Tratamiento</div></div>
+        <div class="stock-controls">
+          <button class="qty-btn" onclick="cambiarQty(this,-1)">−</button>
+          <span class="qty">6</span>
+          <button class="qty-btn" onclick="cambiarQty(this,1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('turnos',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Turnos
+    <div class="nav-indicator"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('clientes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Clientes
+    <div class="nav-indicator"></div>
+  </button>
+  <button class="nav-btn" onclick="switchTab('stock',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    Stock
+    <div class="nav-indicator"></div>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  let confirmados = 5;
+  function confirmarTurno(btn) {
+    const badge = btn.closest('.turno-item').querySelector('.badge');
+    badge.className = 'badge badge-green';
+    badge.textContent = 'Confirmado';
+    btn.remove();
+    confirmados++;
+    document.getElementById('cant-confirmados').textContent = confirmados;
+    showToast('Turno confirmado ✔');
+  }
+
+  let turnosCount = 8;
+  function toggleNuevoTurno() {
+    document.getElementById('nuevo-turno-form').classList.toggle('open');
+  }
+
+  function agregarTurno() {
+    const hora = document.getElementById('nt-hora').value;
+    const cliente = document.getElementById('nt-cliente').value || 'Nuevo cliente';
+    const servicio = document.getElementById('nt-servicio').value;
+    document.getElementById('nt-cliente').value = '';
+
+    const item = document.createElement('div');
+    item.className = 'turno-item';
+    item.innerHTML = `
+      <div class="turno-top"><span class="turno-hora">${hora}</span><span class="badge badge-yellow">Pendiente</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div class="turno-nombre">${cliente}</div><div class="turno-servicio">${servicio}</div></div>
+        <button class="btn-confirmar" onclick="confirmarTurno(this)">Confirmar</button>
+      </div>`;
+    document.getElementById('turnos-list').appendChild(item);
+    turnosCount++;
+    document.getElementById('cant-turnos').textContent = turnosCount;
+    document.getElementById('nuevo-turno-form').classList.remove('open');
+    showToast('Turno agregado ✔');
+  }
+
+  function cambiarQty(btn, delta) {
+    const span = btn.parentElement.querySelector('.qty');
+    let val = parseInt(span.textContent) + delta;
+    if (val < 0) val = 0;
+    span.textContent = val;
+    span.style.color = val <= 3 ? '#f87171' : '';
+    showToast('Stock actualizado ✔');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+</script>
+</body>
+</html>
